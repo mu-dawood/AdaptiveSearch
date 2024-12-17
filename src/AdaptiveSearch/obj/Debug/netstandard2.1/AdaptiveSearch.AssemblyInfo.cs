@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute(@"This package provides a robust and type-safe solution for dynamically building LINQ expressions to filter data in C#. It supports filtering for string, numeric, and DateTime properties, making it ideal for applications that require dynamic querying, such as APIs, search features, and reporting systems.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+65d1c52185303230b62508ef1eceff4c41173ace")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+55c5e0e2bb35c7784ffeeacbcedfd4f62ba1df53")]
 [assembly: System.Reflection.AssemblyProductAttribute("AdaptiveSearch")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AdaptiveSearch")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

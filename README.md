@@ -1,10 +1,3 @@
-Here’s the updated **README.md** with the **API Documentation tables** properly formatted in Markdown for better rendering on GitHub or other markdown viewers.
-
----
-
-### README.md
-
-```markdown
 # AdaptiveSearch
 
 **AdaptiveSearch** is a lightweight and powerful library for dynamically building LINQ filtering expressions in C#. It supports dynamic filtering for **strings**, **numbers**, and **DateTime** properties, making it ideal for advanced search features, APIs, and reporting systems.
