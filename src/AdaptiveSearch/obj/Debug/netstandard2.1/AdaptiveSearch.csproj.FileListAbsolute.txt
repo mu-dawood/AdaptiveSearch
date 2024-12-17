@@ -7,3 +7,4 @@
 /Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/src/AdaptiveSearch/bin/Debug/netstandard2.1/AdaptiveSearch.pdb
 /Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/src/AdaptiveSearch/obj/Debug/netstandard2.1/AdaptiveSearch.dll
 /Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/src/AdaptiveSearch/obj/Debug/netstandard2.1/AdaptiveSearch.pdb
+/Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/src/AdaptiveSearch/obj/Debug/netstandard2.1/AdaptiveSearch.sourcelink.json

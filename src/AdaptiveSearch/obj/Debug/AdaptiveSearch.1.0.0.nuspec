@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>AdaptiveSearch</id>
+    <version>1.0.0</version>
+    <title>Adaptive Search</title>
+    <authors>Mohamed Dawood</authors>
+    <description>This package provides a robust and type-safe solution for dynamically building LINQ expressions to filter data in C#. It supports filtering for string, numeric, and DateTime properties, making it ideal for applications that require dynamic querying, such as APIs, search features, and reporting systems.</description>
+    <repository type="git" url="https://github.com/mu-dawood/AdaptiveSearch" commit="65d1c52185303230b62508ef1eceff4c41173ace" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.1" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="/Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/src/AdaptiveSearch/bin/Debug/netstandard2.1/AdaptiveSearch.dll" target="lib/netstandard2.1/AdaptiveSearch.dll" />
+  </files>
+</package>

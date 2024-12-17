@@ -99,3 +99,4 @@
 /Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/Tests/obj/Debug/net9.0/Tests.pdb
 /Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/Tests/obj/Debug/net9.0/Tests.genruntimeconfig.cache
 /Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/Tests/obj/Debug/net9.0/ref/Tests.dll
+/Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/Tests/obj/Debug/net9.0/Tests.sourcelink.json
