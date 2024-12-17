@@ -14,7 +14,7 @@ public class AdaptiveClass
         public bool IsActive { get; set; }
     }
 
-    public class Filters : IAdaptiveSearchObject
+    public class Filters 
     {
         public StringFilter? Name { get; set; }
         public IntegerFilter? Age { get; set; }
@@ -79,6 +79,31 @@ public class AdaptiveClass
         Assert.DoesNotContain(result, p => p.Name == "Jane");
         Assert.DoesNotContain(result, p => p.Name == "John");
         Assert.DoesNotContain(result, p => p.Name == "Tom");
+    }
+
+    [Fact]
+    public void TestApplyAllProperties()
+    {
+        // Arrange
+        var filter = new
+        {
+            Name = "John",
+        };
+        var data = new List<Entity>
+            {
+                new() { Name = "John Doe",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 },
+                new() { Name = "Johnny",CreatedAt=new DateTime(2025,1,1),IsActive=true,Age=25 },
+                new() { Name = "Jane",CreatedAt=new DateTime(2024,1,1),IsActive=false,Age=30 },
+                new() {Name ="John",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=21 },
+                new(){ Name="Tom",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 }
+            }.AsQueryable();
+
+        // Act
+        var result = data.AdaptiveSearch(filter,true).ToList();
+
+        // Assert
+        Assert.Single(result);
+        Assert.Contains(result, p => p.Name == "John");
     }
 }
 

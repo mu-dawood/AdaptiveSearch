@@ -11,12 +11,13 @@ namespace System.Linq
     public static class AdaptiveSearchExtensions
     {
 
-        public static IQueryable<TSource> AdaptiveSearch<TSource, TObject>(this IQueryable<TSource> source, TObject searchObject) where TObject : IAdaptiveSearchObject
+        public static IQueryable<TSource> AdaptiveSearch<TSource, TObject>(this IQueryable<TSource> source, TObject searchObject, bool applyAllProperties = false)
         {
+            if (searchObject == null) return source;
             Type targetType = searchObject.GetType();
             Type interfaceType = typeof(IAdaptiveFilter);
             PropertyInfo[] properties = targetType.GetProperties()
-            .Where(p => interfaceType.IsAssignableFrom(p.PropertyType))
+            .Where(p => applyAllProperties || interfaceType.IsAssignableFrom(p.PropertyType))
             .ToArray();
             if (properties.Length == 0) return source;
             Type sourceType = searchObject.GetType();
@@ -31,12 +32,22 @@ namespace System.Linq
                 object propertyValue = property.GetValue(searchObject);
 
                 if (propertyValue == null) continue;
-                if (!(propertyValue is IAdaptiveFilter filter) || !filter.HasValue) continue;
+                if (propertyValue is IAdaptiveFilter filter)
+                {
+                    if (!filter.HasValue) continue;
 
-                var parameter = Expression.Parameter(typeof(TSource), "x");
-                var selector = Expression.Property(parameter, property.Name);
-                var expression = filter.BuildExpression<TSource>(selector);
-                query = query.Where(Expression.Lambda<Func<TSource, bool>>(expression, parameter));
+                    var parameter = Expression.Parameter(typeof(TSource), "x");
+                    var selector = Expression.Property(parameter, property.Name);
+                    var expression = filter.BuildExpression<TSource>(selector);
+                    query = query.Where(Expression.Lambda<Func<TSource, bool>>(expression, parameter));
+                }
+                else if (applyAllProperties)
+                {
+                    var parameter = Expression.Parameter(typeof(TSource), "x");
+                    var selector = Expression.Property(parameter, property.Name);
+                    var expression = Expression.Equal(selector, Expression.Constant(propertyValue));
+                    query = query.Where(Expression.Lambda<Func<TSource, bool>>(expression, parameter));
+                }
             }
             return query;
 
@@ -60,7 +71,7 @@ namespace System.Linq
             var property = selector.Body;
             if (property == null) return source;
             var expression = filter.BuildExpression<TSource>(property);
-            
+
             return source.Where(Expression.Lambda<Func<TSource, bool>>(expression, parameter));
         }
 

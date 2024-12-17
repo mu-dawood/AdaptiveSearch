@@ -50,7 +50,7 @@ var data = new List<Person>
     new Person { Name = "Jane Doe" }
 }.AsQueryable();
 
-var result = stringFilter.Filter(data, x => x.Name);
+var result = data.AdaptiveSearch(x => x.Name, filter).ToList();
 
 foreach (var person in result)
 {
@@ -63,11 +63,11 @@ John Smith
 ```
 ---
 
-### 2. Nulti Filter
+### 2. Multi Filter
 
 ```c#
 
-public class Filters : IAdaptiveSearchObject
+public class Filters 
 {
     public StringFilter? Name { get; set; }
     public IntegerFilter? Age { get; set; }
@@ -96,7 +96,7 @@ var data = new List<Person>
      new(){ Name="Tom",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 }
 }.AsQueryable();
 
-var result = stringFilter.Filter(data, x => x.Name);
+var result = data.AdaptiveSearch(filter).ToList();
 
 foreach (var person in result)
 {
@@ -105,10 +105,49 @@ foreach (var person in result)
 ```
 Output:
 ```
-John Smith
+John Doe
 ```
 
+---
 
+
+### 2. Apply all filters
+
+```c#
+
+public class Filters 
+{
+    public string? Name { get; set; }
+    }
+
+/// generate filters instance
+var filter = new Filters
+{
+    Name = "John",
+};
+
+var data = new List<Person>
+{
+     new() { Name = "John Doe",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 },
+     new() { Name = "Johnny",CreatedAt=new DateTime(2025,1,1),IsActive=true,Age=25 },
+     new() { Name = "Jane",CreatedAt=new DateTime(2024,1,1),IsActive=false,Age=30 },
+     new() {Name ="John",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=21 },
+     new(){ Name="Tom",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 }
+}.AsQueryable();
+
+var result = data.AdaptiveSearch(filter,true).ToList();
+
+foreach (var person in result)
+{
+    Console.WriteLine(person.Name);
+}
+```
+Output:
+```
+John
+```
+
+---
 
 ## API Documentation
 
