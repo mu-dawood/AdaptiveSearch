@@ -1,0 +1,8 @@
+is_global = true
+build_property.RootNamespace = AdaptiveSearch
+build_property.ProjectDir = /Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/src/AdaptiveSearch/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.CsWinRTUseWindowsUIXamlProjections = false
+build_property.EffectiveAnalysisLevelStyle = 
+build_property.EnableCodeStyleSeverity = 

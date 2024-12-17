@@ -1,0 +1,5 @@
+/Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/src/AdaptiveSearch/obj/Debug/netstandard2.0/AdaptiveSearch.csproj.AssemblyReference.cache
+/Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/src/AdaptiveSearch/obj/Debug/netstandard2.0/AdaptiveSearch.GeneratedMSBuildEditorConfig.editorconfig
+/Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/src/AdaptiveSearch/obj/Debug/netstandard2.0/AdaptiveSearch.AssemblyInfoInputs.cache
+/Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/src/AdaptiveSearch/obj/Debug/netstandard2.0/AdaptiveSearch.AssemblyInfo.cs
+/Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/src/AdaptiveSearch/obj/Debug/netstandard2.0/AdaptiveSearch.csproj.CoreCompileInputs.cache
