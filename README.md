@@ -113,6 +113,9 @@ John Doe
 
 ### 2. Apply all filters
 
+By default calling `AdaptiveSearch` apply only properties that implement  `IAdaptiveFilter` 
+if you need equal operator to be applied to other types you need to pass `applyAllProperties` parameter as true
+
 ```c#
 
 public class Filters 
