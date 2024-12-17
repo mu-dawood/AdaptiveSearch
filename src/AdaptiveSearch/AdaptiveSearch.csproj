@@ -3,6 +3,15 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
+    <PackageId>AdaptiveSearch</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Mohamed Dawood</Authors>
+    <Title>Adaptive Search</Title>
+    <Title>Adaptive Search</Title>
+    <Description>This package provides a robust and type-safe solution for dynamically building LINQ expressions to filter data in C#. It supports filtering for string, numeric, and DateTime properties, making it ideal for applications that require dynamic querying, such as APIs, search features, and reporting systems.</Description>
+    <RepositoryUrl>https://github.com/mu-dawood/AdaptiveSearch</RepositoryUrl>
+    <RepositoryUrl>https://github.com/mu-dawood/AdaptiveSearch</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
 </Project>
