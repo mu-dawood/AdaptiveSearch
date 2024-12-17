@@ -7,7 +7,7 @@
   "targets": {
     ".NETStandard,Version=v2.1": {},
     ".NETStandard,Version=v2.1/": {
-      "AdaptiveSearch/1.0.0": {
+      "AdaptiveSearch/1.0.1": {
         "runtime": {
           "AdaptiveSearch.dll": {}
         }
@@ -15,7 +15,7 @@
     }
   },
   "libraries": {
-    "AdaptiveSearch/1.0.0": {
+    "AdaptiveSearch/1.0.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -148,6 +148,28 @@ John Smith
 
 ---
 
+### **EnumFilter**
+
+| Property        | Description                                               | Example                             |
+|-----------------|-----------------------------------------------------------|-------------------------------------|
+| `Equal`        | Matches a specific enum value.                            | `Equal = Status.Active`             |
+| `NotEqual`     | Excludes a specific enum value.                           | `NotEqual = Status.Inactive`        |
+| `In`           | Matches if the value is in a list of enum values.         | `In = new List<Status> { Active, Suspended }` |
+| `NotIn`        | Excludes values that are in a list of enum values.        | `NotIn = new List<Status> { Deleted }` |
+
+---
+
+### **ListFilter**
+
+| Property               | Description                                                                       | Example                                       |
+|------------------------|-----------------------------------------------------------------------------------|-----------------------------------------------|
+| `ContainsAny`          | Matches if any value in the target property exists in the provided list.          | `ContainsAny = new List<string> { "C#", "LINQ" }` |
+| `ContainsAll`          | Matches if all values in the provided list exist in the target property.          | `ContainsAll = new List<string> { "C#", "ASP.NET" }` |
+| `DoesNotContainAny`    | Excludes items where any value in the target property exists in the provided list.| `DoesNotContainAny = new List<string> { "Outdated" }` |
+| `DoesNotContainAll`    | Excludes items where all values in the provided list exist in the target property.| `DoesNotContainAll = new List<string> { "Deprecated", "Legacy" }` |
+
+
+---
 ## Benefits
 
 - **Flexible**: Supports dynamic queries for strings, numbers, and dates.

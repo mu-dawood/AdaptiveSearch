@@ -18,5 +18,7 @@ namespace AdaptiveSearch
             var constant = Expression.Constant(value, typeof(T));
             return Expression.Call(property, method, constant);
         }
+
+        
     }
 }
