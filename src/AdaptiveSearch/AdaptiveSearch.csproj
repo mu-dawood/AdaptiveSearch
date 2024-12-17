@@ -13,10 +13,13 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
     <PackageTags>Dynamic LINQ Filtering; LINQ Expressions; Dynamic Queries; String Filter; Numeric Filter; DateTime Filter; Advanced Search; Query Builder; Type-Safe Filtering; Adaptive Search; Filtering Library; LINQ Search; .NET Filters; Expression Trees</PackageTags>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\icon.png" Pack="true" PackagePath="\"/>
     <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 </Project>
