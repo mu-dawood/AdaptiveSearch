@@ -10,31 +10,29 @@ using AdaptiveSearch.Interfaces;
 
 namespace AdaptiveSearch
 {
-    public enum ApplyType { And, Or }
-    public class AdaptiveFilter<TSource, TFilter> : IQueryable<TSource>
-     where TFilter : IAdaptiveFilter
+    public class AdaptiveFilter<TSource, TFilter> : IQueryable<TSource> where TFilter : IAdaptiveFilter
     {
-        private readonly IQueryable<TSource> _source;
+        private readonly IQueryable<TSource> source;
+        private readonly ParameterExpression? parameter;
+        private readonly Expression? expression;
         private readonly TFilter filter;
-        private readonly IEnumerable<Func<ParameterExpression, Expression>> expressions;
-        private readonly ApplyType type;
 
-        private AdaptiveFilter(IQueryable<TSource> source, TFilter filter, ApplyType type, IEnumerable<Func<ParameterExpression, Expression>> expressions)
+        internal AdaptiveFilter(IQueryable<TSource> source, TFilter filter)
         {
-            _source = source;
+            this.source = source;
             this.filter = filter;
-            this.expressions = expressions;
-            this.type = type;
-        }
-        internal AdaptiveFilter(IQueryable<TSource> source, TFilter filter, ApplyType type)
-        {
-            _source = source;
-            this.filter = filter;
-            this.expressions = new Func<ParameterExpression, Expression>[] { };
-            this.type = type;
         }
 
-        public Type ElementType => _source.ElementType;
+        private AdaptiveFilter(IQueryable<TSource> source, ParameterExpression parameter, Expression expression, TFilter filter)
+        {
+            this.source = source;
+            this.parameter = parameter;
+            this.filter = filter;
+            this.expression = expression;
+        }
+
+
+        public Type ElementType => source.ElementType;
 
         public Expression Expression => Apply().Expression;
 
@@ -50,57 +48,36 @@ namespace AdaptiveSearch
             return Apply().GetEnumerator();
         }
 
-
-        public AdaptiveFilter<TSource, TFilter> ApplyTo<TProperty>(Expression<Func<TSource, TProperty>> selector)
+        /// <summary>
+        /// Configure single property behavior.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="selector"></param>
+        /// <param name="filter"></param>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TProperty"></typeparam>
+        /// <typeparam name="TFilter"></typeparam>
+        /// <returns></returns>
+        public AdaptiveFilter<TSource, TFilter> Configure(
+            Func<AdaptiveFilterConfiguration<TSource, TFilter>, AdaptiveFilter<TSource, TFilter>> config
+        )
         {
             if (!filter.HasValue) return this;
-            var body = selector.Body;
-            if (!(body is MemberExpression member))
-            {
-                throw new ArgumentException(string.Format(
-                    "Expression '{0}' refers to a method, not a property.", body.ToString()));
-            }
-            if (!(member.Member is PropertyInfo propInfo))
-            {
-                throw new ArgumentException(string.Format(
-                    "Expression '{0}' refers to a field, not a property.", body.ToString()));
-            }
-            Type sourceType = typeof(TSource);
-            if (propInfo.ReflectedType != null && sourceType != propInfo.ReflectedType && !sourceType.IsSubclassOf(propInfo.ReflectedType))
-            {
-                throw new ArgumentException(string.Format(
-                    "Expression '{0}' refers to a property that is not from type {1}.", body.ToString(),
-                    type));
-            }
-            var res = expressions.Append((p) =>
-            {
-                var selector = Expression.Property(p, propInfo.Name);
-                return filter.BuildExpression<TSource>(selector);
-            });
-            return new AdaptiveFilter<TSource, TFilter>(_source, filter, type, res);
+            return config(new AdaptiveFilterConfiguration<TSource, TFilter>(filter, this));
+
         }
 
-
-
+        internal AdaptiveFilter<TSource, TFilter> WithCExpression(ParameterExpression parameter,Expression expression)
+        {
+            return new AdaptiveFilter<TSource, TFilter>(source, parameter, expression, filter);
+        }
 
         private IQueryable<TSource> Apply()
         {
-            if (expressions.Count() == 0) return _source;
-            var exps = new List<Expression>();
-            var parameter = Expression.Parameter(typeof(TSource), "x");
-            foreach (var e in expressions)
-            {
-                exps.Add(e(parameter));
-            }
-            var combined = type == ApplyType.Or ? exps.Aggregate(Expression.OrElse) : exps.Aggregate(Expression.AndAlso);
-            return _source.Where(Expression.Lambda<Func<TSource, bool>>(combined, parameter));
-
+            if (!filter.HasValue) return source;
+            return source.Where(Expression.Lambda<Func<TSource, bool>>(expression, parameter));
         }
-
-
 
     }
 
-
 }
-

@@ -103,7 +103,9 @@ public class AdaptiveClass
         var data = GetData();
 
         // Act
-        var result = data.AdaptiveSearch(filter, true).ToList();
+        var result = data.AdaptiveSearch(filter)
+           .AllowAllProperties()
+           .ToList();
 
         // Assert
         Assert.Single(result);
@@ -184,10 +186,7 @@ public class AdaptiveClass
         data = data.Append(new() { Name = "Sally", CreatedAt = new DateTime(2024, 1, 1), IsActive = false, Age = 30, JobTitle = "HR Manager", Specialty = "HR" });
 
         // Act
-        var result = data.AdaptiveSearch(filter, ApplyType.Or)
-          .ApplyTo(c => c.Name)
-          .ApplyTo(y => y.JobTitle)
-          .ApplyTo(t => t.Specialty)
+        var result = data.AdaptiveSearch(filter, (c) => c.MapTo((x) => x.Name).MapTo((x) => x.JobTitle).MapTo((x) => x.Specialty))
           .ToList();
 
         // Assert
@@ -204,10 +203,7 @@ public class AdaptiveClass
         data = data.Append(new() { Name = "Sally", CreatedAt = new DateTime(2024, 1, 1), IsActive = false, Age = 30, JobTitle = "HR Manager", Specialty = "HR" });
 
         // Act
-        var result = data.AdaptiveSearch(filter, ApplyType.Or)
-          .ApplyTo(c => c.Name)
-          .ApplyTo(y => y.JobTitle)
-          .ApplyTo(t => t.Specialty)
+        var result = data.AdaptiveSearch(filter, (c) => c.MapTo((x) => x.Name).MapTo((x) => x.JobTitle).MapTo((x) => x.Specialty).WithType(ConfigurationType.Or))
           .ToList();
 
         // Assert
@@ -223,10 +219,7 @@ public class AdaptiveClass
         data = data.Append(new() { Name = "Sally", CreatedAt = new DateTime(2024, 1, 1), IsActive = false, Age = 30, JobTitle = "HR Manager", Specialty = "HR" });
 
         // Act
-        var result = data.AdaptiveSearch(filter, ApplyType.And)
-          .ApplyTo(c => c.Name)
-          .ApplyTo(y => y.JobTitle)
-          .ApplyTo(t => t.Specialty)
+        var result = data.AdaptiveSearch(filter, (c) => c.MapTo((x) => x.Name).MapTo((x) => x.JobTitle).MapTo((x) => x.Specialty).WithType(ConfigurationType.And))
           .ToList();
 
         // Assert
