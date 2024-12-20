@@ -412,7 +412,7 @@
           "build/net6.0/xunit.runner.visualstudio.props": {}
         }
       },
-      "AdaptiveSearch/1.0.5": {
+      "AdaptiveSearch/1.0.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.1",
         "compile": {
@@ -943,7 +943,7 @@
         "xunit.runner.visualstudio.nuspec"
       ]
     },
-    "AdaptiveSearch/1.0.5": {
+    "AdaptiveSearch/1.0.6": {
       "type": "project",
       "path": "../src/AdaptiveSearch/AdaptiveSearch.csproj",
       "msbuildProject": "../src/AdaptiveSearch/AdaptiveSearch.csproj"
@@ -951,7 +951,7 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
-      "AdaptiveSearch >= 1.0.5",
+      "AdaptiveSearch >= 1.0.6",
       "Microsoft.NET.Test.Sdk >= 17.11.1",
       "coverlet.collector >= 6.0.2",
       "xunit >= 2.9.2",

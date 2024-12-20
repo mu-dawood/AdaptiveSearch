@@ -1,4 +1,5 @@
 using System;
+using AdaptiveSearch;
 using AdaptiveSearch.Attributes;
 using AdaptiveSearch.Filters;
 using AdaptiveSearch.Interfaces;
@@ -10,6 +11,8 @@ public class AdaptiveClass
     public class Entity
     {
         public string Name { get; set; } = string.Empty;
+        public string JobTitle { get; set; } = string.Empty;
+        public string Specialty { get; set; } = string.Empty;
         public int Age { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsActive { get; set; }
@@ -36,11 +39,11 @@ public class AdaptiveClass
     {
         return new List<Entity>
             {
-                new() { Name = "John Doe",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 },
-                new() { Name = "Johnny",CreatedAt=new DateTime(2025,1,1),IsActive=true,Age=25 },
-                new() { Name = "Jane",CreatedAt=new DateTime(2024,1,1),IsActive=false,Age=30 },
-                new() {Name ="John",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=21 },
-                new(){ Name="Tom",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 }
+                new() { Name = "John Doe",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 ,JobTitle="Software Engineer",Specialty="IT" },
+                new() { Name = "Johnny",CreatedAt=new DateTime(2025,1,1),IsActive=true,Age=25,JobTitle="Software Tester",Specialty="IT" },
+                new() { Name = "Jane",CreatedAt=new DateTime(2024,1,1),IsActive=false,Age=30,JobTitle="HR Manager",Specialty="HR" },
+                new() {Name ="John",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=21,JobTitle="Software Qc",Specialty="IT" },
+                new(){ Name="Tom",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20,JobTitle="Software Engineer",Specialty="IT" }
             }.AsQueryable();
     }
 
@@ -168,6 +171,68 @@ public class AdaptiveClass
         // Assert
         Assert.Single(result);
         Assert.Contains(result, p => p.Name == "Johnny");
+    }
+
+
+
+    [Fact]
+    public void TestMultiFilter()
+    {
+        // Arrange
+        var filter = new StringFilter { StartsWith = "S" };
+        var data = GetData();
+        data = data.Append(new() { Name = "Sally", CreatedAt = new DateTime(2024, 1, 1), IsActive = false, Age = 30, JobTitle = "HR Manager", Specialty = "HR" });
+
+        // Act
+        var result = data.AdaptiveSearch(filter, ApplyType.Or)
+          .ApplyTo(c => c.Name)
+          .ApplyTo(y => y.JobTitle)
+          .ApplyTo(t => t.Specialty)
+          .ToList();
+
+        // Assert
+        Assert.Equal(5, result.Count);
+        Assert.Contains(result, p => p.Name == "Sally");
+    }
+
+    [Fact]
+    public void TestMultiFilter2()
+    {
+        // Arrange
+        var filter = new StringFilter { NotStartsWith = "S" };
+        var data = GetData();
+        data = data.Append(new() { Name = "Sally", CreatedAt = new DateTime(2024, 1, 1), IsActive = false, Age = 30, JobTitle = "HR Manager", Specialty = "HR" });
+
+        // Act
+        var result = data.AdaptiveSearch(filter, ApplyType.Or)
+          .ApplyTo(c => c.Name)
+          .ApplyTo(y => y.JobTitle)
+          .ApplyTo(t => t.Specialty)
+          .ToList();
+
+        // Assert
+        Assert.Equal(6, result.Count);
+    }
+
+    [Fact]
+    public void TestMultiFilter3()
+    {
+        // Arrange
+        var filter = new StringFilter { NotStartsWith = "S" };
+        var data = GetData();
+        data = data.Append(new() { Name = "Sally", CreatedAt = new DateTime(2024, 1, 1), IsActive = false, Age = 30, JobTitle = "HR Manager", Specialty = "HR" });
+
+        // Act
+        var result = data.AdaptiveSearch(filter, ApplyType.And)
+          .ApplyTo(c => c.Name)
+          .ApplyTo(y => y.JobTitle)
+          .ApplyTo(t => t.Specialty)
+          .ToList();
+
+        // Assert
+        Assert.Single(result);
+        Assert.Contains(result, p => p.Name == "Jane");
+
     }
 
 }

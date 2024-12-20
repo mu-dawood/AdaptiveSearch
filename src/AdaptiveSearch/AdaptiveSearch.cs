@@ -45,26 +45,35 @@ namespace System.Linq
             return res;
         }
 
-
-        public static IEnumerable<TSource> AdaptiveSearch<TSource, TProperty, TFilter>(this IEnumerable<TSource> source, Expression<Func<TSource, TProperty>> selector, TFilter filter) where TFilter : IAdaptiveFilter
-        {
-            if (!filter.HasValue) return source;
-            var parameter = selector.Parameters[0]; // Parameter (e.g., x)
-            var property = selector.Body;
-            if (property == null) return source;
-            var expression = filter.BuildExpression<TSource>(property);
-            return source.Where(Expression.Lambda<Func<TSource, bool>>(expression, parameter).Compile());
-        }
-
+        /// <summary>
+        /// Apply single property
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="selector"></param>
+        /// <param name="filter"></param>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TProperty"></typeparam>
+        /// <typeparam name="TFilter"></typeparam>
+        /// <returns></returns>
         public static IQueryable<TSource> AdaptiveSearch<TSource, TProperty, TFilter>(this IQueryable<TSource> source, Expression<Func<TSource, TProperty>> selector, TFilter filter) where TFilter : IAdaptiveFilter
         {
             if (!filter.HasValue) return source;
-            var parameter = selector.Parameters[0]; // Parameter (e.g., x)
-            var property = selector.Body;
-            if (property == null) return source;
-            var expression = filter.BuildExpression<TSource>(property);
+            return new AdaptiveFilter<TSource, TFilter>(source, filter, ApplyType.Or).ApplyTo(selector);
+        }
 
-            return source.Where(Expression.Lambda<Func<TSource, bool>>(expression, parameter));
+        /// <summary>
+        /// Apply to multiple properties it will return or
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="selector"></param>
+        /// <param name="filter"></param>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TProperty"></typeparam>
+        /// <typeparam name="TFilter"></typeparam>
+        /// <returns></returns>
+        public static AdaptiveFilter<TSource, TFilter> AdaptiveSearch<TSource, TFilter>(this IQueryable<TSource> source, TFilter filter, ApplyType type) where TFilter : IAdaptiveFilter
+        {
+            return new AdaptiveFilter<TSource, TFilter>(source, filter, type); ;
         }
 
     }

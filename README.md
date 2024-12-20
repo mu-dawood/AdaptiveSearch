@@ -63,6 +63,36 @@ John Smith
 ```
 ---
 
+
+### 1. Apply filter to multi property
+
+```c#
+var filter = new StringFilter { NotStartsWith = "S" };
+
+var data = new List<Person>
+{
+  new() { Name = "John Doe",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 ,JobTitle="Software Engineer",Specialty="IT" },
+  new() { Name = "Johnny",CreatedAt=new DateTime(2025,1,1),IsActive=true,Age=25,JobTitle="Software Tester",Specialty="IT" },
+  new() { Name = "Jane",CreatedAt=new DateTime(2024,1,1),IsActive=false,Age=30,JobTitle="HR Manager",Specialty="HR" },
+  new() {Name ="John",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=21,JobTitle="Software Qc",Specialty="IT" },
+  new(){ Name="Tom",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20,JobTitle="Software Engineer",Specialty="IT" },
+  new() { Name = "Sally", CreatedAt = new DateTime(2024, 1, 1), IsActive = false, Age = 30, JobTitle = "HR Manager", Specialty = "HR" }
+}.AsQueryable();
+
+var result1 = data.AdaptiveSearch(filter, ApplyType.And)
+          .ApplyTo(c => c.Name)
+          .ApplyTo(y => y.JobTitle)
+          .ApplyTo(t => t.Specialty)
+          .ToList(); // result is only Jane
+
+var result1 = data.AdaptiveSearch(filter, ApplyType.Or)
+          .ApplyTo(c => c.Name)
+          .ApplyTo(y => y.JobTitle)
+          .ApplyTo(t => t.Specialty)
+          .ToList(); // Return all data as all of them passed
+```
+---
+
 ### 2. Multi Filter
 
 ```c#
