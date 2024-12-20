@@ -160,4 +160,5 @@ namespace AdaptiveSearch
         internal Queue<PropertyInfo> TakeProperties => takeProperties ??= new Queue<PropertyInfo>();
 
     }
+
 }

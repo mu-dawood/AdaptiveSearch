@@ -11,7 +11,7 @@
     "/Users/mohamed_dawood/.nuget/packages/": {}
   },
   "project": {
-    "version": "1.0.4",
+    "version": "1.0.5",
     "restore": {
       "projectUniqueName": "/Users/mohamed_dawood/Desktop/Packages/AdaptiveSearch/src/AdaptiveSearch/AdaptiveSearch.csproj",
       "projectName": "AdaptiveSearch",

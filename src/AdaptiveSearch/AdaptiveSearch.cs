@@ -14,12 +14,13 @@ namespace System.Linq
         internal static bool IsTake(this PropertyInfo propertyInfo) => propertyInfo.GetCustomAttribute<TakeAttribute>() != null;
 
 
-        public static AdaptiveSearch<TSource, TObject> AdaptiveSearch<TSource, TObject>(this IQueryable<TSource> source, TObject searchObject, bool applyAllProperties = false, bool applyPaging = false) where TObject : notnull
+        public static AdaptiveSearch<TSource, TObject> AdaptiveSearch<TSource, TObject>(this IQueryable<TSource> source, TObject searchObject, bool applyAllProperties = false, bool applyPaging = false)
         {
+            var specs = new PropertySpecifications();
+            if (searchObject == null) return new AdaptiveSearch<TSource, TObject>(source, searchObject, specs);
             Type targetType = searchObject.GetType();
             Type interfaceType = typeof(IAdaptiveFilter);
             var properties = targetType.GetProperties();
-            var specs = new PropertySpecifications();
             foreach (var p in properties)
             {
                 if (interfaceType.IsAssignableFrom(p.PropertyType))

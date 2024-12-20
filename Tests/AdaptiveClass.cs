@@ -28,6 +28,8 @@ public class AdaptiveClass
         public DateTimeFilter? CreatedAt { get; set; }
         public BooleanFilter? IsActive { get; set; }
 
+
+
     }
 
     private IQueryable<Entity> GetData()
