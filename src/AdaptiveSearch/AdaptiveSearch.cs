@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AdaptiveSearch.Attributes;
 using AdaptiveSearch.Interfaces;
 
 namespace System.Linq
@@ -10,6 +9,9 @@ namespace System.Linq
 
     public static class AdaptiveSearchExtensions
     {
+        private static bool IsSkip(this PropertyInfo propertyInfo) => propertyInfo.GetCustomAttributes<SkipAttribute>().Count() > 0;
+        private static bool IsTake(this PropertyInfo propertyInfo) => propertyInfo.GetCustomAttributes<TakeAttribute>().Count() > 0;
+
 
         public static IQueryable<TSource> AdaptiveSearch<TSource, TObject>(this IQueryable<TSource> source, TObject searchObject, bool applyAllProperties = false)
         {
@@ -17,7 +19,8 @@ namespace System.Linq
             Type targetType = searchObject.GetType();
             Type interfaceType = typeof(IAdaptiveFilter);
             PropertyInfo[] properties = targetType.GetProperties()
-            .Where(p => applyAllProperties || interfaceType.IsAssignableFrom(p.PropertyType))
+            .Where(p => applyAllProperties || p.IsSkip() || p.IsTake() || interfaceType.IsAssignableFrom(p.PropertyType))
+            .OrderBy((p) => p.IsSkip() ? 1 : p.IsTake() ? 2 : 0)
             .ToArray();
             if (properties.Length == 0) return source;
             Type sourceType = searchObject.GetType();
@@ -40,6 +43,14 @@ namespace System.Linq
                     var selector = Expression.Property(parameter, property.Name);
                     var expression = filter.BuildExpression<TSource>(selector);
                     query = query.Where(Expression.Lambda<Func<TSource, bool>>(expression, parameter));
+                }
+                else if (property.IsSkip())
+                {
+                    query = query.Skip((int)propertyValue);
+                }
+                else if (property.IsTake())
+                {
+                    query = query.Take((int)propertyValue);
                 }
                 else if (applyAllProperties)
                 {

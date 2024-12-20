@@ -1,4 +1,5 @@
 using System;
+using AdaptiveSearch.Attributes;
 using AdaptiveSearch.Filters;
 using AdaptiveSearch.Interfaces;
 
@@ -12,30 +13,42 @@ public class AdaptiveClass
         public int Age { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsActive { get; set; }
+
+
     }
 
-    public class Filters 
+    public class Filters
     {
+        [Skip]
+        public int Skip { get; set; }
+        [Take]
+        public int Take { get; set; } = 20;
         public StringFilter? Name { get; set; }
         public IntegerFilter? Age { get; set; }
         public DateTimeFilter? CreatedAt { get; set; }
         public BooleanFilter? IsActive { get; set; }
+
     }
+
+    private IQueryable<Entity> GetData()
+    {
+        return new List<Entity>
+            {
+                new() { Name = "John Doe",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 },
+                new() { Name = "Johnny",CreatedAt=new DateTime(2025,1,1),IsActive=true,Age=25 },
+                new() { Name = "Jane",CreatedAt=new DateTime(2024,1,1),IsActive=false,Age=30 },
+                new() {Name ="John",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=21 },
+                new(){ Name="Tom",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 }
+            }.AsQueryable();
+    }
+
 
     [Fact]
     public void TestSingleFilter()
     {
         // Arrange
         var filter = new StringFilter { StartsWith = "John" };
-        var data = new List<Entity>
-            {
-                new() { Name = "John Doe",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 },
-                new() { Name = "Johnny",CreatedAt=new DateTime(2025,1,1),IsActive=true,Age=25 },
-                new() { Name = "Jane",CreatedAt=new DateTime(2024,1,1),IsActive=false,Age=30 },
-                new() {Name ="John",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 },
-                new(){ Name="Tom",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 }
-            }.AsQueryable();
-
+        var data = GetData();
         // Act
         var result = data.AdaptiveSearch(x => x.Name, filter).ToList();
 
@@ -60,14 +73,7 @@ public class AdaptiveClass
                 Equal = new DateTime(2023, 1, 1)
             }
         };
-        var data = new List<Entity>
-            {
-                new() { Name = "John Doe",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 },
-                new() { Name = "Johnny",CreatedAt=new DateTime(2025,1,1),IsActive=true,Age=25 },
-                new() { Name = "Jane",CreatedAt=new DateTime(2024,1,1),IsActive=false,Age=30 },
-                new() {Name ="John",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=21 },
-                new(){ Name="Tom",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 }
-            }.AsQueryable();
+        var data = GetData();
 
         // Act
         var result = data.AdaptiveSearch(filter).ToList();
@@ -89,21 +95,78 @@ public class AdaptiveClass
         {
             Name = "John",
         };
-        var data = new List<Entity>
-            {
-                new() { Name = "John Doe",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 },
-                new() { Name = "Johnny",CreatedAt=new DateTime(2025,1,1),IsActive=true,Age=25 },
-                new() { Name = "Jane",CreatedAt=new DateTime(2024,1,1),IsActive=false,Age=30 },
-                new() {Name ="John",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=21 },
-                new(){ Name="Tom",CreatedAt=new DateTime(2023,1,1),IsActive=true,Age=20 }
-            }.AsQueryable();
+        var data = GetData();
 
         // Act
-        var result = data.AdaptiveSearch(filter,true).ToList();
+        var result = data.AdaptiveSearch(filter, true).ToList();
 
         // Assert
         Assert.Single(result);
         Assert.Contains(result, p => p.Name == "John");
     }
+
+    [Fact]
+    public void TestObjectSkip()
+    {
+        // Arrange
+        var filter = new Filters
+        {
+            Name = new() { StartsWith = "John" },
+            Skip = 1,
+
+        };
+        var data = GetData();
+
+        // Act
+        var result = data.AdaptiveSearch(filter).ToList();
+
+        // Assert
+        Assert.Equal(2, result.Count);
+        Assert.Contains(result, p => p.Name == "John");
+        Assert.Contains(result, p => p.Name == "Johnny");
+    }
+
+
+    [Fact]
+    public void TestObjectTake()
+    {
+        // Arrange
+        var filter = new Filters
+        {
+            Name = new() { StartsWith = "John" },
+            Take = 1,
+
+        };
+        var data = GetData();
+
+        // Act
+        var result = data.AdaptiveSearch(filter).ToList();
+
+        // Assert
+        Assert.Single(result);
+        Assert.Contains(result, p => p.Name == "John Doe");
+    }
+
+    [Fact]
+    public void TestObjectSkipTake()
+    {
+        // Arrange
+        var filter = new Filters
+        {
+            Name = new() { StartsWith = "John" },
+            Take = 1,
+            Skip = 1,
+
+        };
+        var data = GetData();
+
+        // Act
+        var result = data.AdaptiveSearch(filter).ToList();
+
+        // Assert
+        Assert.Single(result);
+        Assert.Contains(result, p => p.Name == "Johnny");
+    }
+
 }
 

@@ -152,6 +152,22 @@ John
 
 ---
 
+### Skip and take
+
+## you can also add skip and take properties:
+
+```c#
+[Skip]
+public int Skip { get; set; }
+[Take]
+public int Take { get; set; } = 20;
+
+```
+
+> Currently we apply skip then take at the end of query
+
+---
+
 ## API Documentation
 
 ### **StringFilter**
