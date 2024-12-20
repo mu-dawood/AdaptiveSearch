@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using AdaptiveSearch;
 using AdaptiveSearch.Attributes;
 using AdaptiveSearch.Interfaces;
 
@@ -9,59 +10,38 @@ namespace System.Linq
 
     public static class AdaptiveSearchExtensions
     {
-        private static bool IsSkip(this PropertyInfo propertyInfo) => propertyInfo.GetCustomAttributes<SkipAttribute>().Count() > 0;
-        private static bool IsTake(this PropertyInfo propertyInfo) => propertyInfo.GetCustomAttributes<TakeAttribute>().Count() > 0;
+        internal static bool IsSkip(this PropertyInfo propertyInfo) => propertyInfo.GetCustomAttribute<SkipAttribute>() != null;
+        internal static bool IsTake(this PropertyInfo propertyInfo) => propertyInfo.GetCustomAttribute<TakeAttribute>() != null;
 
 
-        public static IQueryable<TSource> AdaptiveSearch<TSource, TObject>(this IQueryable<TSource> source, TObject searchObject, bool applyAllProperties = false)
+        public static AdaptiveSearch<TSource, TObject> AdaptiveSearch<TSource, TObject>(this IQueryable<TSource> source, TObject searchObject, bool applyAllProperties = false, bool applyPaging = false) where TObject : notnull
         {
-            if (searchObject == null) return source;
             Type targetType = searchObject.GetType();
             Type interfaceType = typeof(IAdaptiveFilter);
-            PropertyInfo[] properties = targetType.GetProperties()
-            .Where(p => applyAllProperties || p.IsSkip() || p.IsTake() || interfaceType.IsAssignableFrom(p.PropertyType))
-            .OrderBy((p) => p.IsSkip() ? 1 : p.IsTake() ? 2 : 0)
-            .ToArray();
-            if (properties.Length == 0) return source;
-            Type sourceType = searchObject.GetType();
-            string[] sourceProperties = sourceType.GetProperties().Select((x) => x.Name).ToArray();
-
-            var query = source;
-            foreach (PropertyInfo property in properties)
+            var properties = targetType.GetProperties();
+            var specs = new PropertySpecifications();
+            foreach (var p in properties)
             {
-                if (!sourceProperties.Contains(property.Name))
-                    throw new Exception($"Source type does not contain property `{property.Name}`");
-
-                object propertyValue = property.GetValue(searchObject);
-
-                if (propertyValue == null) continue;
-                if (propertyValue is IAdaptiveFilter filter)
+                if (interfaceType.IsAssignableFrom(p.PropertyType))
                 {
-                    if (!filter.HasValue) continue;
-
-                    var parameter = Expression.Parameter(typeof(TSource), "x");
-                    var selector = Expression.Property(parameter, property.Name);
-                    var expression = filter.BuildExpression<TSource>(selector);
-                    query = query.Where(Expression.Lambda<Func<TSource, bool>>(expression, parameter));
+                    specs.FilterProperties.Enqueue(p);
                 }
-                else if (property.IsSkip())
+                else if (p.IsSkip())
                 {
-                    query = query.Skip((int)propertyValue);
+                    specs.SkipProperties.Enqueue(p);
                 }
-                else if (property.IsTake())
+                else if (p.IsTake())
                 {
-                    query = query.Take((int)propertyValue);
+                    specs.TakeProperties.Enqueue(p);
                 }
                 else if (applyAllProperties)
                 {
-                    var parameter = Expression.Parameter(typeof(TSource), "x");
-                    var selector = Expression.Property(parameter, property.Name);
-                    var expression = Expression.Equal(selector, Expression.Constant(propertyValue));
-                    query = query.Where(Expression.Lambda<Func<TSource, bool>>(expression, parameter));
+                    specs.NonFilterProperties.Enqueue(p);
                 }
             }
-            return query;
-
+            var res = new AdaptiveSearch<TSource, TObject>(source, searchObject, specs).ApplyFilters().ApplyNonFilters();
+            if (applyPaging) return res.ApplyPaging();
+            return res;
         }
 
 

@@ -161,6 +161,8 @@ John
 public int Skip { get; set; }
 [Take]
 public int Take { get; set; } = 20;
+/// Paging is not applied by default
+/// You can apply paging either by calling ApplyPaging() or pass ApplyPaging as and argument to adaptive search
 
 ```
 

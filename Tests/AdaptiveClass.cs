@@ -118,7 +118,7 @@ public class AdaptiveClass
         var data = GetData();
 
         // Act
-        var result = data.AdaptiveSearch(filter).ToList();
+        var result = data.AdaptiveSearch(filter).ApplyPaging().ToList();
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -140,7 +140,7 @@ public class AdaptiveClass
         var data = GetData();
 
         // Act
-        var result = data.AdaptiveSearch(filter).ToList();
+        var result = data.AdaptiveSearch(filter).ApplyPaging().ToList();
 
         // Assert
         Assert.Single(result);
@@ -151,7 +151,7 @@ public class AdaptiveClass
     public void TestObjectSkipTake()
     {
         // Arrange
-        var filter = new Filters
+        Filters? filter = new()
         {
             Name = new() { StartsWith = "John" },
             Take = 1,
@@ -161,7 +161,7 @@ public class AdaptiveClass
         var data = GetData();
 
         // Act
-        var result = data.AdaptiveSearch(filter).ToList();
+        var result = data.AdaptiveSearch(filter).ApplyPaging().ToList();
 
         // Assert
         Assert.Single(result);
