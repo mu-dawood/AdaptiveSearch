@@ -16,7 +16,7 @@ namespace AdaptiveSearch.Filters
         public T? LessThan { get; set; }
         public T? LessThanOrEqual { get; set; }
 
-        public bool HasValue => Equal.HasValue || NotEqual.HasValue || GreaterThan.HasValue || GreaterThanOrEqual.HasValue || LessThan.HasValue || LessThanOrEqual.HasValue;
+        public bool HasValue ()=> Equal.HasValue || NotEqual.HasValue || GreaterThan.HasValue || GreaterThanOrEqual.HasValue || LessThan.HasValue || LessThanOrEqual.HasValue;
 
         public Expression BuildExpression<TSource>(Expression property)
         {

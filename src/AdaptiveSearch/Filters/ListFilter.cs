@@ -15,7 +15,7 @@ namespace AdaptiveSearch.Filters
         public IEnumerable<T> DoesNotContainAny { get; set; } = new List<T>();
         public IEnumerable<T> DoesNotContainAll { get; set; } = new List<T>();
 
-        public bool HasValue => ContainsAny.Any() || ContainsAll.Any() || DoesNotContainAny.Any() || DoesNotContainAll.Any();
+        public bool HasValue ()=> ContainsAny.Any() || ContainsAll.Any() || DoesNotContainAny.Any() || DoesNotContainAll.Any();
 
         public Expression BuildExpression<TSource>(Expression property)
         {

@@ -79,7 +79,7 @@ namespace System.Linq
 
         public static IQueryable<TSource> AdaptiveSearch<TSource, TFilter, TProperty>(this IQueryable<TSource> source, Expression<Func<TSource, TProperty>> selector, TFilter filter) where TFilter : IAdaptiveFilter?
         {
-            if (filter == null || !filter.HasValue) return source;
+            if (filter == null || !filter.HasValue()) return source;
             var parameter = selector.Parameters[0]; // Parameter (e.g., x)
             var property = selector.Body;
             if (property == null) return source;

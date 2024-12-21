@@ -7,6 +7,6 @@ namespace AdaptiveSearch.Interfaces
     {
         Expression BuildExpression<TSource>(Expression property);
 
-        bool HasValue { get; }
+        bool HasValue();
     }
 }

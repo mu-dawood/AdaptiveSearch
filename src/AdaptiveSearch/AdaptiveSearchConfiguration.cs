@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -10,12 +11,13 @@ namespace AdaptiveSearch
     public enum ConfigurationType { And, Or }
     public class AdaptiveSearchConfiguration<TSource, TObject, TFilter> where TFilter : IAdaptiveFilter?
     {
+        [MaybeNull, AllowNull]
         private readonly TFilter filter;
         private readonly PropertyInfo propertyInfo;
         private readonly IEnumerable<Func<ParameterExpression, Expression>> expressions;
         private readonly AdaptiveSearch<TSource, TObject> _source;
 
-        internal AdaptiveSearchConfiguration(PropertyInfo propertyInfo, TFilter filter, AdaptiveSearch<TSource, TObject> source)
+        internal AdaptiveSearchConfiguration(PropertyInfo propertyInfo,[MaybeNull, AllowNull] TFilter filter, AdaptiveSearch<TSource, TObject> source)
         {
             this.filter = filter;
             expressions = new Func<ParameterExpression, Expression>[] { };
@@ -23,7 +25,7 @@ namespace AdaptiveSearch
             this.propertyInfo = propertyInfo;
         }
 
-        private AdaptiveSearchConfiguration(PropertyInfo propertyInfo, TFilter filter, IEnumerable<Func<ParameterExpression, Expression>> expressions, AdaptiveSearch<TSource, TObject> source)
+        private AdaptiveSearchConfiguration(PropertyInfo propertyInfo,[MaybeNull, AllowNull] TFilter filter, IEnumerable<Func<ParameterExpression, Expression>> expressions, AdaptiveSearch<TSource, TObject> source)
         {
             this.filter = filter;
             this.expressions = expressions;

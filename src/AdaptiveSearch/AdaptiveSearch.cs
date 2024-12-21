@@ -57,7 +57,7 @@ namespace AdaptiveSearch
                 if (propertyValue == null) continue;
                 if (typeof(TSource).GetProperty(prop.Name) == null)
                     throw new Exception($"Source type does not contain property `{prop.Name}`");
-                if (!(propertyValue is IAdaptiveFilter filter) || !filter.HasValue) continue;
+                if (!(propertyValue is IAdaptiveFilter filter) || !filter.HasValue()) continue;
                 var parameter = Expression.Parameter(typeof(TSource), "x");
                 var selector = Expression.Property(parameter, prop.Name);
                 var expression = filter.BuildExpression<TSource>(selector);
@@ -185,19 +185,19 @@ namespace AdaptiveSearch
             Expression<Func<TObject, TFilter>> selector,
             Func<AdaptiveSearchConfiguration<TSource, TObject, TFilter>, AdaptiveSearch<TSource, TObject>> config
         )
-        where TFilter : IAdaptiveFilter
+        where TFilter : IAdaptiveFilter?
         {
             var property = selector.GetPropertyOfType();
             if (property.GetValue(searchObject) is TFilter filter)
             {
-                if (filter.HasValue)
+                if (filter.HasValue())
                 {
                     return config(new AdaptiveSearchConfiguration<TSource, TObject, TFilter>(property, filter, this));
                 }
                 else return this;
             }
             else
-                throw new ArgumentException("Error while getting selected filter");
+                return this;
         }
 
 
@@ -210,7 +210,7 @@ namespace AdaptiveSearch
                 return new AdaptiveSearchConfiguration<TSource, TObject, TFilter>(property, filter, this);
             }
             else
-                throw new ArgumentException("Error while getting selected filter");
+                return new AdaptiveSearchConfiguration<TSource, TObject, TFilter>(property, default, this);
         }
 
         internal AdaptiveSearch<TSource, TObject> WithCustomExpression(string propertyName, Func<IQueryable<TSource>, IQueryable<TSource>> expression)
@@ -221,7 +221,8 @@ namespace AdaptiveSearch
         }
         private IQueryable<TSource> Apply(bool applyPaging = false)
         {
-            if(applyPaging) {
+            if (applyPaging)
+            {
                 return ApplyFilters().ApplyNonFilters().ApplyPaging().source;
             }
             return ApplyFilters().ApplyNonFilters().source;

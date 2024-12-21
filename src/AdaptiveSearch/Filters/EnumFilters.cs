@@ -14,7 +14,7 @@ namespace AdaptiveSearch.Filters
         public List<TEnum> In { get; set; } = new List<TEnum>();
         public List<TEnum> NotIn { get; set; } = new List<TEnum>();
 
-        public bool HasValue => Equal.HasValue || NotEqual.HasValue || In.Any() || NotIn.Any();
+        public bool HasValue ()=> Equal.HasValue || NotEqual.HasValue || In.Any() || NotIn.Any();
 
         public Expression BuildExpression<TSource>(Expression property)
         {

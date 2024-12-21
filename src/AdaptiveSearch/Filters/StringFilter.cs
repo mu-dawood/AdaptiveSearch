@@ -18,7 +18,7 @@ namespace AdaptiveSearch.Filters
         public string? NotContains { get; set; }
         public bool? IsNullOrEmpty { get; set; }
 
-        public bool HasValue => IsNullOrEmpty.HasValue || !string.IsNullOrWhiteSpace(Equal) || !string.IsNullOrWhiteSpace(StartsWith) || !string.IsNullOrWhiteSpace(EndsWith) || !string.IsNullOrWhiteSpace(Contains) || !string.IsNullOrWhiteSpace(NotEqual) || !string.IsNullOrWhiteSpace(NotStartsWith) || !string.IsNullOrWhiteSpace(NotEndsWith) || !string.IsNullOrWhiteSpace(NotContains);
+        public bool HasValue ()=> IsNullOrEmpty.HasValue || !string.IsNullOrWhiteSpace(Equal) || !string.IsNullOrWhiteSpace(StartsWith) || !string.IsNullOrWhiteSpace(EndsWith) || !string.IsNullOrWhiteSpace(Contains) || !string.IsNullOrWhiteSpace(NotEqual) || !string.IsNullOrWhiteSpace(NotStartsWith) || !string.IsNullOrWhiteSpace(NotEndsWith) || !string.IsNullOrWhiteSpace(NotContains);
 
         public Expression BuildExpression<TSource>(Expression property)
         {

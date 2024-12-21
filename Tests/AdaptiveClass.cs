@@ -258,5 +258,28 @@ public class AdaptiveClass
         Assert.DoesNotContain(result, p => p.Name == "Tom");
     }
 
+    [Fact]
+    public void TestObjectFilterConfigWhenNull()
+    {
+        // Arrange
+        var filter = new Filters
+        {
+        };
+        var data = GetData();
+
+        // Act
+        var q = data.AdaptiveSearch(filter)
+          .Configure((c) => c.Name)
+          .MapTo((x) => x.Name)
+          .MapTo((x) => x.JobTitle)
+          .MapTo((x) => x.Specialty)
+          .WithType(ConfigurationType.Or);
+
+        var result = q.ToList();
+
+        // Assert
+        Assert.Equal(5, result.Count);
+    }
+
 }
 

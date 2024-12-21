@@ -63,7 +63,7 @@ namespace AdaptiveSearch
         )
         {
             if (filter == null) return this;
-            if (!filter.HasValue) return this;
+            if (!filter.HasValue()) return this;
             return config(new AdaptiveFilterConfiguration<TSource, TFilter>(filter, this));
 
         }
@@ -76,7 +76,7 @@ namespace AdaptiveSearch
         private IQueryable<TSource> Apply()
         {
             if (filter == null) return source;
-            if (!filter.HasValue) return source;
+            if (!filter.HasValue()) return source;
             return source.Where(Expression.Lambda<Func<TSource, bool>>(expression, parameter));
         }
 

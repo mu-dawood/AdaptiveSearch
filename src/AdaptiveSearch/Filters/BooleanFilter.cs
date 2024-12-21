@@ -12,7 +12,7 @@ namespace AdaptiveSearch.Filters
         public bool? Equal { get; set; }
         public bool? NotEqual { get; set; }
 
-        public bool HasValue => Equal.HasValue || NotEqual.HasValue;
+        public bool HasValue ()=> Equal.HasValue || NotEqual.HasValue;
 
         public Expression BuildExpression<TSource>(Expression property)
         {
