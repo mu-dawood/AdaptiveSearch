@@ -10,7 +10,7 @@ using AdaptiveSearch.Interfaces;
 
 namespace AdaptiveSearch
 {
-    public class AdaptiveFilter<TSource, TFilter> : IQueryable<TSource> where TFilter : IAdaptiveFilter
+    public class AdaptiveFilter<TSource, TFilter> : IQueryable<TSource> where TFilter : IAdaptiveFilter?
     {
         private readonly IQueryable<TSource> source;
         private readonly ParameterExpression? parameter;
@@ -62,18 +62,20 @@ namespace AdaptiveSearch
             Func<AdaptiveFilterConfiguration<TSource, TFilter>, AdaptiveFilter<TSource, TFilter>> config
         )
         {
+            if (filter == null) return this;
             if (!filter.HasValue) return this;
             return config(new AdaptiveFilterConfiguration<TSource, TFilter>(filter, this));
 
         }
 
-        internal AdaptiveFilter<TSource, TFilter> WithCExpression(ParameterExpression parameter,Expression expression)
+        internal AdaptiveFilter<TSource, TFilter> WithCExpression(ParameterExpression parameter, Expression expression)
         {
             return new AdaptiveFilter<TSource, TFilter>(source, parameter, expression, filter);
         }
 
         private IQueryable<TSource> Apply()
         {
+            if (filter == null) return source;
             if (!filter.HasValue) return source;
             return source.Where(Expression.Lambda<Func<TSource, bool>>(expression, parameter));
         }

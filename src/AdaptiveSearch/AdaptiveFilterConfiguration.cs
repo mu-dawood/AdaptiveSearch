@@ -6,7 +6,7 @@ using AdaptiveSearch.Interfaces;
 
 namespace AdaptiveSearch
 {
-    public class AdaptiveFilterConfiguration<TSource, TObject> where TObject : IAdaptiveFilter
+    public class AdaptiveFilterConfiguration<TSource, TObject> where TObject : IAdaptiveFilter?
     {
         private readonly TObject filter;
         private readonly IEnumerable<Func<ParameterExpression, Expression>> expressions;
@@ -37,6 +37,7 @@ namespace AdaptiveSearch
 
         public AdaptiveFilterConfiguration<TSource, TObject> MapTo<TProperty>(Expression<Func<TSource, TProperty>> selector)
         {
+            if(filter == null) return this;
             var body = selector.Body;
             var propInfo = selector.GetPropertyOfType();
             var res = expressions.Append((p) =>
@@ -67,7 +68,7 @@ namespace AdaptiveSearch
 
         public static implicit operator AdaptiveFilter<TSource, TObject>(AdaptiveFilterConfiguration<TSource, TObject> configuration)
         {
-            return configuration.WithType(ConfigurationType.And);
+            return configuration.WithType(ConfigurationType.Or);
         }
     }
 

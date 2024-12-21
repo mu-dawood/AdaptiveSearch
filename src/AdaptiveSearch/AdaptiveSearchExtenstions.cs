@@ -16,7 +16,7 @@ namespace System.Linq
 
         public static AdaptiveSearch<TSource, TObject> AdaptiveSearch<TSource, TObject>(this IQueryable<TSource> source, TObject searchObject)
         {
-            var specs = new PropertySpecifications();
+            var specs = new PropertySpecifications<TSource>();
             if (searchObject == null) return new AdaptiveSearch<TSource, TObject>(source, searchObject, specs);
             Type targetType = searchObject.GetType();
             Type interfaceType = typeof(IAdaptiveFilter);
@@ -52,7 +52,7 @@ namespace System.Linq
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TFilter"></typeparam>
         /// <returns></returns>
-        public static AdaptiveFilter<TSource, TFilter> AdaptiveSearch<TSource, TFilter>(this IQueryable<TSource> source, TFilter filter, Func<AdaptiveFilterConfiguration<TSource, TFilter>, AdaptiveFilter<TSource, TFilter>> config) where TFilter : IAdaptiveFilter
+        public static AdaptiveFilter<TSource, TFilter> AdaptiveSearch<TSource, TFilter>(this IQueryable<TSource> source, TFilter filter, Func<AdaptiveFilterConfiguration<TSource, TFilter>, AdaptiveFilter<TSource, TFilter>> config) where TFilter : IAdaptiveFilter?
         {
             return new AdaptiveFilter<TSource, TFilter>(source, filter).Configure(config);
         }
@@ -77,9 +77,9 @@ namespace System.Linq
         /// <typeparam name="TProperty"></typeparam>
         /// <returns></returns>
 
-        public static IQueryable<TSource> AdaptiveSearch<TSource, TFilter, TProperty>(this IQueryable<TSource> source, Expression<Func<TSource, TProperty>> selector, TFilter filter) where TFilter : IAdaptiveFilter
+        public static IQueryable<TSource> AdaptiveSearch<TSource, TFilter, TProperty>(this IQueryable<TSource> source, Expression<Func<TSource, TProperty>> selector, TFilter filter) where TFilter : IAdaptiveFilter?
         {
-            if (!filter.HasValue) return source;
+            if (filter == null || !filter.HasValue) return source;
             var parameter = selector.Parameters[0]; // Parameter (e.g., x)
             var property = selector.Body;
             if (property == null) return source;

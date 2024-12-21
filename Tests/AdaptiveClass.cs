@@ -228,5 +228,35 @@ public class AdaptiveClass
 
     }
 
+
+    [Fact]
+    public void TestObjectFilterConfig()
+    {
+        // Arrange
+        var filter = new Filters
+        {
+            Name = new() { StartsWith = "John" },
+        };
+        var data = GetData();
+
+        // Act
+        var q = data.AdaptiveSearch(filter)
+          .Configure((c) => c.Name)
+          .MapTo((x) => x.Name)
+          .MapTo((x) => x.JobTitle)
+          .MapTo((x) => x.Specialty)
+          .WithType(ConfigurationType.Or);
+
+        var result = q.ToList();
+
+        // Assert
+        Assert.Equal(3, result.Count);
+        Assert.Contains(result, p => p.Name == "John Doe");
+        Assert.Contains(result, p => p.Name == "Johnny");
+        Assert.DoesNotContain(result, p => p.Name == "Jane");
+        Assert.Contains(result, p => p.Name == "John");
+        Assert.DoesNotContain(result, p => p.Name == "Tom");
+    }
+
 }
 

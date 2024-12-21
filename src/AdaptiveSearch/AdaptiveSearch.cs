@@ -14,9 +14,9 @@ namespace AdaptiveSearch
     public class AdaptiveSearch<TSource, TObject> : IQueryable<TSource>
     {
         private readonly IQueryable<TSource> source;
-        private readonly PropertySpecifications properties;
+        private readonly PropertySpecifications<TSource> properties;
         private readonly TObject searchObject;
-        internal AdaptiveSearch(IQueryable<TSource> source, TObject searchObject, PropertySpecifications properties)
+        internal AdaptiveSearch(IQueryable<TSource> source, TObject searchObject, PropertySpecifications<TSource> properties)
         {
             this.source = source;
             this.properties = properties;
@@ -31,7 +31,7 @@ namespace AdaptiveSearch
 
         public IEnumerator<TSource> GetEnumerator()
         {
-            return Apply().GetEnumerator();
+            return Apply(true).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -48,6 +48,11 @@ namespace AdaptiveSearch
             {
                 var prop = queue.Dequeue();
                 if (prop == null) continue;
+                if (properties.CustomExpressions.ContainsKey(prop.Name))
+                {
+                    query = properties.CustomExpressions[prop.Name](query);
+                    continue;
+                }
                 var propertyValue = prop.GetValue(searchObject);
                 if (propertyValue == null) continue;
                 if (typeof(TSource).GetProperty(prop.Name) == null)
@@ -70,6 +75,11 @@ namespace AdaptiveSearch
             {
                 var prop = queue.Dequeue();
                 if (prop == null) continue;
+                if (properties.CustomExpressions.ContainsKey(prop.Name))
+                {
+                    query = properties.CustomExpressions[prop.Name](query);
+                    continue;
+                }
                 var propertyValue = prop.GetValue(searchObject);
                 if (propertyValue == null) continue;
                 if (typeof(TSource).GetProperty(prop.Name) == null)
@@ -172,7 +182,7 @@ namespace AdaptiveSearch
         /// <typeparam name="TFilter"></typeparam>
         /// <returns></returns>
         public AdaptiveSearch<TSource, TObject> Configure<TFilter>(
-            Expression<Func<TSource, TFilter>> selector,
+            Expression<Func<TObject, TFilter>> selector,
             Func<AdaptiveSearchConfiguration<TSource, TObject, TFilter>, AdaptiveSearch<TSource, TObject>> config
         )
         where TFilter : IAdaptiveFilter
@@ -190,46 +200,62 @@ namespace AdaptiveSearch
                 throw new ArgumentException("Error while getting selected filter");
         }
 
-        internal AdaptiveSearch<TSource, TObject> WithCustomExpression(string propertyName, Expression expression)
+
+        public AdaptiveSearchConfiguration<TSource, TObject, TFilter> Configure<TFilter>(Expression<Func<TObject, TFilter>> selector)
+          where TFilter : IAdaptiveFilter?
+        {
+            var property = selector.GetPropertyOfType();
+            if (property.GetValue(searchObject) is TFilter filter)
+            {
+                return new AdaptiveSearchConfiguration<TSource, TObject, TFilter>(property, filter, this);
+            }
+            else
+                throw new ArgumentException("Error while getting selected filter");
+        }
+
+        internal AdaptiveSearch<TSource, TObject> WithCustomExpression(string propertyName, Func<IQueryable<TSource>, IQueryable<TSource>> expression)
         {
             var customExpressions = properties.CustomExpressions.ToDictionary((entry) => entry.Key, (entry) => entry.Value);
             customExpressions[propertyName] = expression;
             return new AdaptiveSearch<TSource, TObject>(source, searchObject, properties.CopyWith(customExpressions: customExpressions));
         }
-        private IQueryable<TSource> Apply()
+        private IQueryable<TSource> Apply(bool applyPaging = false)
         {
-            return ApplyFilters().ApplyNonFilters();
+            if(applyPaging) {
+                return ApplyFilters().ApplyNonFilters().ApplyPaging().source;
+            }
+            return ApplyFilters().ApplyNonFilters().source;
         }
 
     }
 
 
-    internal class PropertySpecifications
+    internal class PropertySpecifications<TSource>
     {
         private Queue<PropertyInfo>? skipProperties;
         private Queue<PropertyInfo>? takeProperties;
         private Queue<PropertyInfo>? filterProperties;
         private Queue<PropertyInfo>? nonFilterProperties;
-        private Dictionary<string, Expression>? customExpressions;
+        private Dictionary<string, Func<IQueryable<TSource>, IQueryable<TSource>>>? customExpressions;
         private bool allowNonFilterProperties = false;
         internal bool AllowNonFilterProperties => allowNonFilterProperties;
-        internal Dictionary<string, Expression> CustomExpressions => customExpressions ??= new Dictionary<string, Expression>();
+        internal Dictionary<string, Func<IQueryable<TSource>, IQueryable<TSource>>> CustomExpressions => customExpressions ??= new Dictionary<string, Func<IQueryable<TSource>, IQueryable<TSource>>>();
         internal Queue<PropertyInfo> NonFilterProperties => nonFilterProperties ??= new Queue<PropertyInfo>();
         internal Queue<PropertyInfo> FilterProperties => filterProperties ??= new Queue<PropertyInfo>();
         internal Queue<PropertyInfo> SkipProperties => skipProperties ??= new Queue<PropertyInfo>();
         internal Queue<PropertyInfo> TakeProperties => takeProperties ??= new Queue<PropertyInfo>();
 
 
-        internal PropertySpecifications CopyWith(
+        internal PropertySpecifications<TSource> CopyWith(
             Queue<PropertyInfo>? skipProperties = null,
             Queue<PropertyInfo>? takeProperties = null,
             Queue<PropertyInfo>? filterProperties = null,
             Queue<PropertyInfo>? nonFilterProperties = null,
             bool? allowNonFilterProperties = null,
-            Dictionary<string, Expression>? customExpressions = null
+            Dictionary<string, Func<IQueryable<TSource>, IQueryable<TSource>>>? customExpressions = null
         )
         {
-            return new PropertySpecifications
+            return new PropertySpecifications<TSource>
             {
                 skipProperties = skipProperties ?? this.skipProperties,
                 takeProperties = takeProperties ?? this.takeProperties,

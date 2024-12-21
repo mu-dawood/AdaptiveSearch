@@ -79,16 +79,18 @@ var data = new List<Person>
   new() { Name = "Sally", CreatedAt = new DateTime(2024, 1, 1), IsActive = false, Age = 30, JobTitle = "HR Manager", Specialty = "HR" }
 }.AsQueryable();
 
-var result1 = data.AdaptiveSearch(filter, ApplyType.And)
-          .ApplyTo(c => c.Name)
-          .ApplyTo(y => y.JobTitle)
-          .ApplyTo(t => t.Specialty)
+var result1 = data.AdaptiveSearch(filter, (c) => 
+          c.MapTo((x) => x.Name)
+          .MapTo((x) => x.JobTitle)
+          .MapTo((x) => x.Specialty)
+          .WithType(ConfigurationType.And))
           .ToList(); // result is only Jane
 
-var result1 = data.AdaptiveSearch(filter, ApplyType.Or)
-          .ApplyTo(c => c.Name)
-          .ApplyTo(y => y.JobTitle)
-          .ApplyTo(t => t.Specialty)
+var result2 = data.AdaptiveSearch(filter, (c) => 
+          c.MapTo((x) => x.Name)
+          .MapTo((x) => x.JobTitle)
+          .MapTo((x) => x.Specialty)
+          .WithType(ConfigurationType.Or))
           .ToList(); // Return all data as all of them passed
 ```
 ---

@@ -8,7 +8,7 @@ using AdaptiveSearch.Interfaces;
 namespace AdaptiveSearch
 {
     public enum ConfigurationType { And, Or }
-    public class AdaptiveSearchConfiguration<TSource, TObject, TFilter> where TFilter : IAdaptiveFilter
+    public class AdaptiveSearchConfiguration<TSource, TObject, TFilter> where TFilter : IAdaptiveFilter?
     {
         private readonly TFilter filter;
         private readonly PropertyInfo propertyInfo;
@@ -42,13 +42,17 @@ namespace AdaptiveSearch
 
         public AdaptiveSearchConfiguration<TSource, TObject, TFilter> MapTo<TProperty>(Expression<Func<TSource, TProperty>> selector)
         {
+            if (filter == null) return this;
             var body = selector.Body;
             var propInfo = selector.GetPropertyOfType();
+
+
             var res = expressions.Append((p) =>
             {
                 var selector = Expression.Property(p, propInfo.Name);
                 return filter.BuildExpression<TSource>(selector);
             });
+
             return new AdaptiveSearchConfiguration<TSource, TObject, TFilter>(propertyInfo, filter, res, _source);
         }
 
@@ -67,13 +71,13 @@ namespace AdaptiveSearch
                 exps.Add(e(parameter));
             }
             var combined = type == ConfigurationType.Or ? exps.Aggregate(Expression.OrElse) : exps.Aggregate(Expression.AndAlso);
-            return _source.WithCustomExpression(propertyInfo.Name, combined);
+            return _source.WithCustomExpression(propertyInfo.Name, (source) => source.Where(Expression.Lambda<Func<TSource, bool>>(combined, parameter)));
 
         }
 
         public static implicit operator AdaptiveSearch<TSource, TObject>(AdaptiveSearchConfiguration<TSource, TObject, TFilter> configuration)
         {
-            return configuration.WithType(ConfigurationType.And);
+            return configuration.WithType(ConfigurationType.Or);
         }
 
     }
